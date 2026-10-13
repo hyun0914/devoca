@@ -5,6 +5,7 @@ import '../../domain/models/progress_model.dart';
 class ProgressRepository {
   static const _key = 'devoca_word_progress';
   static const _dailyKey = 'devoca_daily_words';
+  static const _sqlSolvedKey = 'devoca_sql_solved';
 
   Future<Map<String, WordProgress>> loadAll() async {
     final prefs = await SharedPreferences.getInstance();
@@ -36,5 +37,15 @@ class ProgressRepository {
   Future<void> saveDailyWords(String dateKey, List<String> words) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_dailyKey, jsonEncode({dateKey: words}));
+  }
+
+  Future<Set<String>> loadSolvedSqlIds() async {
+    final prefs = await SharedPreferences.getInstance();
+    return (prefs.getStringList(_sqlSolvedKey) ?? const []).toSet();
+  }
+
+  Future<void> saveSolvedSqlIds(Set<String> ids) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(_sqlSolvedKey, ids.toList());
   }
 }

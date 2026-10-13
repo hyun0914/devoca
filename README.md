@@ -1,8 +1,8 @@
-# Devoca — 개발자 영단어 학습 앱
+# Devoca — 개발자 영단어 · SQL 학습 앱
 
 **🌐 배포 주소: https://devoca-fc24f.web.app**
 
-개발자가 실무에서 자주 마주치는 영어 단어를 **철자 중심**으로 학습하는 Flutter Web PWA입니다.
+개발자가 실무에서 자주 마주치는 영어 단어를 **철자 중심**으로 학습하고, 기본 SQL 쿼리를 **직접 작성해 실행**하며 연습하는 Flutter Web PWA입니다.
 
 ## 주요 기능
 
@@ -26,9 +26,16 @@
 - 날짜 기반 seed로 하루 동안 동일한 5개 유지
 - 철자를 완전히 맞춰야 당일 학습 완료로 표시
 
+### 🗄️ SQL 연습
+- 문제를 읽고 쿼리를 직접 작성해 실행 (35문제, 7개 분류)
+- 브라우저 안에서 SQLite(WASM)로 실제 실행 — 서버 없이 동작
+- 실행 결과 표와 함께 정답 / 결과 다름 / 실행 오류 피드백
+- 테이블 보기, 정답 예시 보기, SQL 키워드 입력 버튼 제공
+
 ### 📊 학습 현황
 - 미학습 / 학습 중 / 마스터 3구간으로 단어 분류
 - 학습 중 단어는 다음 인터벌까지 남은 일수 표시
+- SQL 연습 해결 개수 표시
 - ⓘ 버튼으로 마스터 기준 상세 안내 제공
 
 ## 마스터 기준 (간격 반복 학습)
@@ -85,12 +92,36 @@
 | SQL | 33 | SELECT, LEFT JOIN, CASE WHEN, CTE, EXPLAIN, PRIMARY KEY |
 | NoSQL | 10 | document, aggregate, TTL index, replica set, CAP theorem |
 
+## SQL 연습
+
+`users` / `products` / `orders` 3개 테이블을 대상으로 기본 쿼리를 작성합니다.
+
+| 분류 | 문제 수 | 다루는 내용 |
+|------|:------:|------------|
+| SELECT 기본 | 3 | `*`, 컬럼 지정, `DISTINCT` |
+| WHERE 조건 | 7 | 비교, `AND`, `OR` / `IN`, `BETWEEN`, `LIKE`, `IS NULL` |
+| 정렬과 개수 제한 | 4 | `ORDER BY`, `LIMIT`, 다중 정렬 |
+| 집계 함수 | 5 | `COUNT`, `MAX`, `SUM`, `AVG` |
+| GROUP BY | 4 | 그룹별 개수·합계, `HAVING` |
+| JOIN | 6 | 2~3개 테이블 연결, `LEFT JOIN`, JOIN + 집계 |
+| 데이터 변경 | 6 | `INSERT`, `UPDATE`, `DELETE` |
+
+### 채점 방식
+
+쿼리 문자열이 아니라 **실행 결과**를 비교합니다. 사용자 쿼리와 정답 쿼리를 각각 새 DB에서 실행하므로, 표현이 달라도 결과가 같으면 정답입니다.
+
+- 조회 문제 — 결과 값을 비교. 컬럼 이름(별칭)은 보지 않고, `ORDER BY` 문제만 행 순서까지 확인
+- 변경 문제 — 실행 후 테이블 상태를 비교
+- 컬럼 순서는 문제에 적힌 순서와 같아야 함
+- 오답이면 컬럼 수 / 행 수 / 값 / 정렬 중 무엇이 다른지 안내
+
 ## 기술 스택
 
 - **Flutter** (Web only) + Material 3
 - **State management** — flutter_bloc (Cubit)
 - **Routing** — go_router (StatefulShellRoute)
 - **TTS** — flutter_tts (Web Speech API, Google 목소리 자동 선택)
+- **SQL 엔진** — sqlite3 (WASM, 브라우저 인메모리 DB)
 - **Storage** — shared_preferences (로컬 학습 진도 저장)
 - **Backend** — Firebase (Hosting 배포 완료 / Auth · Firestore 추후 적용 예정)
 - **PWA** — manifest.json + service worker
@@ -100,24 +131,32 @@
 ```
 lib/
 ├── data/
-│   ├── repositories/      # SharedPreferences 기반 저장소
-│   ├── services/          # TTS 서비스 (목소리 자동 선택)
-│   └── word_data.dart     # 333개 단어 + 카테고리 타입 매핑
+│   ├── repositories/         # SharedPreferences 기반 저장소
+│   ├── services/             # TTS 서비스, SQL 엔진 · 채점 서비스
+│   ├── sql_problem_data.dart # SQL 스키마 · 샘플 데이터 · 35문제
+│   └── word_data.dart        # 333개 단어 + 카테고리 타입 매핑
 ├── domain/
-│   └── models/            # WordModel, WordProgress (intervalCorrects)
+│   └── models/               # WordModel, WordProgress, SqlProblem, SqlResult
 ├── presentation/
-│   ├── cubits/            # WordCubit (타입·카테고리 필터), QuizCubit, ProgressCubit
-│   ├── screens/           # 5개 화면
-│   └── widgets/           # CategoryChip, MasteryIndicator
-├── firebase_options.dart  # Firebase 프로젝트 설정 (자동 생성)
+│   ├── cubits/               # WordCubit, QuizCubit, ProgressCubit, SqlPracticeCubit
+│   ├── screens/              # 7개 화면
+│   └── widgets/              # CategoryChip, MasteryIndicator, SqlResultTable
+├── firebase_options.dart     # Firebase 프로젝트 설정 (자동 생성)
 └── main.dart
+web/
+└── sqlite3.wasm              # SQLite WASM 바이너리
 ```
+
+> `web/sqlite3.wasm`은 `pubspec.lock`의 `sqlite3` 패키지 버전과 같은 [릴리스](https://github.com/simolus3/sqlite3.dart/releases) 파일이어야 합니다. 패키지 버전을 올리면 이 파일도 함께 교체하세요.
 
 ## 시작하기
 
 ```bash
 flutter pub get
 flutter run -d chrome
+
+# 테스트 (SQL 채점은 실제 SQLite로 검증)
+flutter test
 ```
 
 > **요구사항** — Flutter 3.x, Dart 3.5+, Chrome 권장 (Web Speech API 지원)

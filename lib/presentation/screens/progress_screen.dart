@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import '../../data/sql_problem_data.dart';
 import '../../data/word_data.dart';
 import '../../domain/models/progress_model.dart';
 import '../../domain/models/word_model.dart';
 import '../cubits/progress/progress_cubit.dart';
+import '../cubits/sql/sql_practice_cubit.dart';
 import '../widgets/category_chip.dart';
 
 class ProgressScreen extends StatelessWidget {
@@ -76,6 +78,12 @@ class ProgressScreen extends StatelessWidget {
                   child: Padding(
                     padding: EdgeInsets.fromLTRB(hp, 16, hp, 8),
                     child: _StatsRow(state: state),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(hp, 0, hp, 8),
+                    child: const _SqlProgressCard(),
                   ),
                 ),
 
@@ -198,6 +206,58 @@ class _StatsRow extends StatelessWidget {
           color: Colors.green[700]!,
         ),
       ],
+    );
+  }
+}
+
+class _SqlProgressCard extends StatelessWidget {
+  const _SqlProgressCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<SqlPracticeCubit, SqlPracticeState>(
+      buildWhen: (a, b) => a.solvedIds != b.solvedIds,
+      builder: (context, state) {
+        final solved =
+            kSqlProblems.where((p) => state.solvedIds.contains(p.id)).length;
+        return Card(
+          margin: EdgeInsets.zero,
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: () => context.go('/sql'),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 8, 12),
+              child: Row(
+                children: [
+                  Icon(Icons.storage_rounded,
+                      color: Theme.of(context).colorScheme.primary),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'SQL 연습  $solved / ${kSqlProblems.length} 해결',
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        const SizedBox(height: 8),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: LinearProgressIndicator(
+                            value: solved / kSqlProblems.length,
+                            minHeight: 6,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Icon(Icons.chevron_right),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

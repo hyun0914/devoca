@@ -5,6 +5,8 @@ import 'presentation/screens/word_card_screen.dart';
 import 'presentation/screens/spelling_practice_screen.dart';
 import 'presentation/screens/quiz_screen.dart';
 import 'presentation/screens/progress_screen.dart';
+import 'presentation/screens/sql_problem_list_screen.dart';
+import 'presentation/screens/sql_problem_screen.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/words',
@@ -26,11 +28,24 @@ final appRouter = GoRouter(
         ]),
         StatefulShellBranch(routes: [
           GoRoute(
+            path: '/sql',
+            builder: (context, state) => const SqlProblemListScreen(),
+          ),
+        ]),
+        StatefulShellBranch(routes: [
+          GoRoute(
             path: '/progress',
             builder: (context, state) => const ProgressScreen(),
           ),
         ]),
       ],
+    ),
+    GoRoute(
+      path: '/sql/:id',
+      builder: (context, state) => SqlProblemScreen(
+        key: ValueKey(state.pathParameters['id']),
+        problemId: state.pathParameters['id']!,
+      ),
     ),
     GoRoute(
       path: '/word/:english',
@@ -71,6 +86,11 @@ class _AppShell extends StatelessWidget {
             icon: Icon(Icons.quiz_outlined),
             selectedIcon: Icon(Icons.quiz),
             label: '퀴즈',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.storage_outlined),
+            selectedIcon: Icon(Icons.storage),
+            label: 'SQL',
           ),
           NavigationDestination(
             icon: Icon(Icons.bar_chart_outlined),

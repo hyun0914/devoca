@@ -2,9 +2,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'data/repositories/progress_repository.dart';
+import 'data/services/sql_practice_service.dart';
 import 'firebase_options.dart';
 import 'presentation/cubits/progress/progress_cubit.dart';
 import 'presentation/cubits/quiz/quiz_cubit.dart';
+import 'presentation/cubits/sql/sql_practice_cubit.dart';
 import 'presentation/cubits/word/word_cubit.dart';
 import 'router.dart';
 
@@ -21,9 +23,16 @@ class DevocaApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
+        RepositoryProvider(create: (_) => SqlPracticeService()),
         BlocProvider(create: (_) => WordCubit()),
         BlocProvider(create: (_) => QuizCubit()),
         BlocProvider(create: (_) => ProgressCubit(ProgressRepository())),
+        BlocProvider(
+          create: (context) => SqlPracticeCubit(
+            context.read<SqlPracticeService>(),
+            ProgressRepository(),
+          ),
+        ),
       ],
       child: MaterialApp.router(
         title: 'Devoca',
