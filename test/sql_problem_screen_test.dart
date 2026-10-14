@@ -54,16 +54,21 @@ void main() {
     expect(await ProgressRepository().loadSolvedSqlIds(), {'where-age'});
   });
 
-  testWidgets('키워드 버튼이 입력창에 삽입된다', (tester) async {
-    await pumpProblem(tester, 'select-all');
-    await tester.tap(find.text('SELECT'));
-    await tester.tap(find.text('*'));
-    await tester.tap(find.text('FROM'));
+  testWidgets('힌트는 첫 글자만 보여주고 요청하면 철자를 보여준다', (tester) async {
+    await pumpProblem(tester, 'where-age');
+    expect(find.text('SELECT'), findsNothing);
+
+    await tester.tap(find.text('힌트'));
+    await tester.pumpAndSettle();
+    expect(find.text('S _ _ _ _ _'), findsOneWidget);
+    expect(find.text('W _ _ _ _'), findsOneWidget);
+    expect(find.text('WHERE'), findsNothing);
+
+    await tester.tap(find.text('철자 보기'));
     await tester.pump();
-    expect(
-      tester.widget<TextField>(find.byType(TextField)).controller!.text,
-      'SELECT * FROM ',
-    );
+    expect(find.text('SELECT'), findsOneWidget);
+    expect(find.text('FROM'), findsOneWidget);
+    expect(find.text('WHERE'), findsOneWidget);
   });
 
   testWidgets('변경 문제는 실행 후 테이블을 보여준다', (tester) async {

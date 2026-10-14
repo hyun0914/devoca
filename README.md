@@ -13,16 +13,21 @@
 
 ### ✏️ 철자 연습
 - 한국어 발음·의미를 힌트로 보여주고 철자를 직접 입력
-- 글자 입력 시 즉각적인 초록(정답) / 빨강(오답) 피드백
+- 🔊 발음 듣기로 실제 영어 발음을 들으며 받아쓰기 (cache / cash처럼 한글 발음만으로 헷갈리는 단어 구분)
+- 코딩 실무 단어(`forEach`, `StatelessWidget` 등)는 대소문자까지 맞아야 정답
+- 확인을 누른 뒤 글자별 초록(정답) / 빨강(오답) 피드백 — 입력 중에는 정답 여부를 보여주지 않음
 - 전부 맞춰야 학습 완료 처리
 
 ### 🧠 퀴즈
 - 랜덤 10문제 객관식 (영단어 → 한국어 의미 4지선다)
 - 오늘의 퀴즈: 당일 추천 단어 5개만 집중 출제
+- 뜻을 알아보는 연습이라 철자 진도(마스터)에는 반영하지 않음
 
 ### ☀️ 오늘의 학습
 - 매일 5개 단어 자동 추천
 - 우선순위: 미학습 → 인터벌 도전 가능 → 학습 중 → 마스터
+- 3글자 이하 단어(`len`, `DNS` 등)는 다른 미학습 단어를 다 본 뒤에 추천
+- 카드에는 영단어를 숨기고, 누르면 단어 카드 없이 바로 철자 연습으로 이동 (맞힌 뒤에 영단어 공개)
 - 날짜 기반 seed로 하루 동안 동일한 5개 유지
 - 철자를 완전히 맞춰야 당일 학습 완료로 표시
 
@@ -30,7 +35,8 @@
 - 문제를 읽고 쿼리를 직접 작성해 실행 (35문제, 7개 분류)
 - 브라우저 안에서 SQLite(WASM)로 실제 실행 — 서버 없이 동작
 - 실행 결과 표와 함께 정답 / 결과 다름 / 실행 오류 피드백
-- 테이블 보기, 정답 예시 보기, SQL 키워드 입력 버튼 제공
+- 힌트는 필요할 때만: 쓰이는 키워드를 첫 글자만 보여주고(`S _ _ _ _ _`), 원하면 철자 공개
+- 테이블 보기, 정답 예시 보기 제공
 
 ### 📊 학습 현황
 - 미학습 / 학습 중 / 마스터 3구간으로 단어 분류
@@ -52,11 +58,11 @@
   Day 9+  ●   3회차 정답  (4일 이상 뒤) → ⭐ 마스터
 ```
 
-하루에 몰아서 맞춰도 마스터되지 않습니다.
+하루에 몰아서 맞춰도 마스터되지 않습니다. 철자를 틀리면 인터벌 횟수가 1회 줄어들어, 마스터한 단어도 다시 학습 중으로 돌아갑니다.
 
 ## 단어 목록
 
-333개 단어, 19개 카테고리 — **개념 용어 / 코딩 실무 / DB** 3가지 타입으로 분류
+321개 단어, 19개 카테고리 — **개념 용어 / 코딩 실무 / DB** 3가지 타입으로 분류
 
 ### 🔵 개념 용어
 
@@ -78,10 +84,10 @@
 | JavaScript | 24 | forEach, map, find, includes, Object.keys, flat, some, every |
 | Java | 22 | ArrayList, HashMap, Arrays.sort, String.format, Integer.parseInt |
 | Flutter | 22 | StatelessWidget, setState, showDialog, MediaQuery.of, StreamBuilder |
-| Dart | 22 | null safety, mixin, extension, toList, contains, sort, trim, expand |
-| Python | 24 | list comprehension, lambda, append, split, join, sorted, getattr |
-| Kotlin | 25 | val/var, data class, coroutine, let, also, run, takeIf, groupBy |
-| Naming | 21 | count, result, temp, max, min, flag, length |
+| Dart | 21 | null safety, mixin, extension, toList, contains, sort, trim, expand |
+| Python | 20 | list comprehension, lambda, append, except, sorted, getattr |
+| Kotlin | 21 | val/var, data class, coroutine, let, also, run, takeIf, groupBy |
+| Naming | 19 | result, total, temp, max, min, flag, length |
 | Config | 11 | yaml, toml, dockerfile, linting, prettier |
 
 ### 🟠 DB
@@ -89,7 +95,7 @@
 | 카테고리 | 단어 수 | 예시 |
 |---------|:------:|------|
 | Database | 20 | transaction, index, schema, sharding, ORM, trigger |
-| SQL | 33 | SELECT, LEFT JOIN, CASE WHEN, CTE, EXPLAIN, PRIMARY KEY |
+| SQL | 32 | SELECT, LEFT JOIN, CASE WHEN, OFFSET, EXPLAIN, PRIMARY KEY |
 | NoSQL | 10 | document, aggregate, TTL index, replica set, CAP theorem |
 
 ## SQL 연습
@@ -134,7 +140,7 @@ lib/
 │   ├── repositories/         # SharedPreferences 기반 저장소
 │   ├── services/             # TTS 서비스, SQL 엔진 · 채점 서비스
 │   ├── sql_problem_data.dart # SQL 스키마 · 샘플 데이터 · 35문제
-│   └── word_data.dart        # 333개 단어 + 카테고리 타입 매핑
+│   └── word_data.dart        # 321개 단어 + 카테고리 타입 매핑
 ├── domain/
 │   └── models/               # WordModel, WordProgress, SqlProblem, SqlResult
 ├── presentation/

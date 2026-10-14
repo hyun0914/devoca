@@ -1,24 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubits/quiz/quiz_cubit.dart';
-import '../cubits/progress/progress_cubit.dart';
 
 class QuizScreen extends StatelessWidget {
   const QuizScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<QuizCubit, QuizState>(
-      listenWhen: (a, b) =>
-          a.status != QuizStatus.answered && b.status == QuizStatus.answered,
-      listener: (context, state) {
-        if (state.currentWord != null) {
-          context.read<ProgressCubit>().recordPractice(
-                state.currentWord!.english,
-                correct: state.isCorrect,
-              );
-        }
-      },
+    // 객관식은 뜻을 알아보는 연습이라 철자 진도(마스터)에는 반영하지 않는다
+    return BlocBuilder<QuizCubit, QuizState>(
       builder: (context, state) {
         return Scaffold(
           appBar: AppBar(
@@ -63,7 +53,7 @@ class _StartView extends StatelessWidget {
                     )),
             const SizedBox(height: 12),
             Text(
-              '10개의 단어를 무작위로 출제합니다.\n영어 단어에 해당하는 한국어 의미를 고르세요.',
+              '10개의 단어를 무작위로 출제합니다.\n영어 단어에 해당하는 한국어 의미를 고르세요.\n퀴즈 결과는 마스터 진도에 반영되지 않아요.',
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.grey[600], height: 1.6),
             ),

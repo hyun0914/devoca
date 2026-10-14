@@ -453,8 +453,11 @@ class _DailyWordCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 카드를 먼저 보면 철자를 옮겨 쓰게 되므로, 아직 못 맞춘 단어는 바로 철자 연습으로 보낸다
     return GestureDetector(
-      onTap: () => context.push('/word/${word.english}'),
+      onTap: () => context.push(seen
+          ? '/word/${word.english}'
+          : '/word/${word.english}/spelling?from=daily'),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         width: 108,
@@ -480,7 +483,8 @@ class _DailyWordCard extends StatelessWidget {
                 ],
                 Expanded(
                   child: Text(
-                    word.english,
+                    // 영단어는 오늘 철자를 맞춘 뒤에만 보여준다
+                    seen ? word.english : word.koreanPronunciation,
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -493,7 +497,7 @@ class _DailyWordCard extends StatelessWidget {
             ),
             const SizedBox(height: 3),
             Text(
-              word.koreanPronunciation,
+              seen ? word.koreanPronunciation : '철자 쓰기',
               style: TextStyle(
                 color: Colors.white.withValues(alpha: 0.75),
                 fontSize: 11,

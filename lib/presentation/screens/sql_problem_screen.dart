@@ -8,13 +8,6 @@ import '../../domain/models/sql_result.dart';
 import '../cubits/sql/sql_practice_cubit.dart';
 import '../widgets/sql_result_table.dart';
 
-const _keywords = [
-  'SELECT', '*', 'FROM', 'WHERE', 'AND', 'OR', 'ORDER BY', 'DESC', 'LIMIT',
-  'DISTINCT', 'IN', 'BETWEEN', 'LIKE', 'IS NULL', 'COUNT(*)', 'SUM', 'AVG',
-  'MAX', 'GROUP BY', 'HAVING', 'JOIN', 'LEFT JOIN', 'ON', 'INSERT INTO',
-  'VALUES', 'UPDATE', 'SET', 'DELETE FROM',
-];
-
 class SqlProblemScreen extends StatefulWidget {
   final String problemId;
   const SqlProblemScreen({super.key, required this.problemId});
@@ -25,7 +18,6 @@ class SqlProblemScreen extends StatefulWidget {
 
 class _SqlProblemScreenState extends State<SqlProblemScreen> {
   final _controller = TextEditingController();
-  final _focusNode = FocusNode();
 
   int get _index => kSqlProblems.indexWhere((p) => p.id == widget.problemId);
 
@@ -38,25 +30,7 @@ class _SqlProblemScreenState extends State<SqlProblemScreen> {
   @override
   void dispose() {
     _controller.dispose();
-    _focusNode.dispose();
     super.dispose();
-  }
-
-  void _insertKeyword(String keyword) {
-    final value = _controller.value;
-    final selection = value.selection.isValid
-        ? value.selection
-        : TextSelection.collapsed(offset: value.text.length);
-    final before = value.text.substring(0, selection.start);
-    final needsSpace =
-        before.isNotEmpty && !before.endsWith(' ') && !before.endsWith('\n');
-    final inserted = '${needsSpace ? ' ' : ''}$keyword ';
-    _controller.value = TextEditingValue(
-      text: value.text.replaceRange(selection.start, selection.end, inserted),
-      selection:
-          TextSelection.collapsed(offset: selection.start + inserted.length),
-    );
-    _focusNode.requestFocus();
   }
 
   void _showTables() {
@@ -65,6 +39,13 @@ class _SqlProblemScreenState extends State<SqlProblemScreen> {
       isScrollControlled: true,
       showDragHandle: true,
       builder: (_) => const _TablesSheet(),
+    );
+  }
+
+  void _showHint(SqlProblem problem) {
+    showDialog<void>(
+      context: context,
+      builder: (_) => _HintDialog(keywords: problem.keywords),
     );
   }
 
@@ -133,25 +114,8 @@ class _SqlProblemScreenState extends State<SqlProblemScreen> {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  SizedBox(
-                    height: 36,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: _keywords.length,
-                      separatorBuilder: (_, __) => const SizedBox(width: 6),
-                      itemBuilder: (context, i) => ActionChip(
-                        label: Text(_keywords[i],
-                            style: const TextStyle(
-                                fontFamily: 'monospace', fontSize: 12)),
-                        visualDensity: VisualDensity.compact,
-                        onPressed: () => _insertKeyword(_keywords[i]),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
                   TextField(
                     controller: _controller,
-                    focusNode: _focusNode,
                     minLines: 4,
                     maxLines: 8,
                     autocorrect: false,
@@ -170,6 +134,11 @@ class _SqlProblemScreenState extends State<SqlProblemScreen> {
                   const SizedBox(height: 12),
                   Row(
                     children: [
+                      TextButton.icon(
+                        onPressed: () => _showHint(problem),
+                        icon: const Icon(Icons.lightbulb_outline, size: 18),
+                        label: const Text('힌트'),
+                      ),
                       TextButton(
                         onPressed: () => _showAnswer(problem),
                         child: const Text('정답 보기'),
@@ -212,6 +181,73 @@ class _SqlProblemScreenState extends State<SqlProblemScreen> {
           );
         },
       ),
+    );
+  }
+}
+
+class _HintDialog extends StatefulWidget {
+  final List<String> keywords;
+  const _HintDialog({required this.keywords});
+
+  @override
+  State<_HintDialog> createState() => _HintDialogState();
+}
+
+class _HintDialogState extends State<_HintDialog> {
+  bool _revealed = false;
+
+  // 철자를 떠올려 보도록 첫 글자만 보여준다: ORDER BY → O _ _ _ _  B _
+  String _mask(String keyword) => keyword
+      .split(' ')
+      .map((word) =>
+          [word[0], for (var i = 1; i < word.length; i++) '_'].join(' '))
+      .join('   ');
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return AlertDialog(
+      title: const Text('힌트'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('이 문제에 쓰이는 키워드',
+              style: TextStyle(color: Colors.grey[600], fontSize: 13)),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final keyword in widget.keywords)
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    _revealed ? keyword : _mask(keyword),
+                    style: const TextStyle(
+                        fontFamily: 'monospace', fontWeight: FontWeight.w600),
+                  ),
+                ),
+            ],
+          ),
+        ],
+      ),
+      actions: [
+        if (!_revealed)
+          TextButton(
+            onPressed: () => setState(() => _revealed = true),
+            child: const Text('철자 보기'),
+          ),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('닫기'),
+        ),
+      ],
     );
   }
 }

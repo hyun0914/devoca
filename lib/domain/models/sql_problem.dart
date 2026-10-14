@@ -25,7 +25,53 @@ class SqlProblem extends Equatable {
 
   bool get isMutation => targetTable != null;
 
+  /// 정답 쿼리에 쓰인 SQL 키워드 (등장 순서, 중복 제거). 힌트용.
+  List<String> get keywords {
+    final found = <String, int>{};
+    var rest = answerSql.toUpperCase();
+    for (final keyword in _hintKeywords) {
+      final pattern = RegExp('\\b${keyword.replaceAll(' ', '\\s+')}\\b');
+      final match = pattern.firstMatch(rest);
+      if (match == null) continue;
+      found[keyword] = match.start;
+      // LEFT JOIN을 찾은 뒤 JOIN이 또 잡히지 않도록 지운다
+      rest = rest.replaceAll(pattern, ' ' * keyword.length);
+    }
+    return found.keys.toList()..sort((a, b) => found[a]!.compareTo(found[b]!));
+  }
+
   @override
   List<Object?> get props =>
       [id, category, title, description, answerSql, ordered, targetTable];
 }
+
+// 여러 단어 키워드를 먼저 둬야 한 단어 키워드보다 먼저 매칭된다
+const _hintKeywords = [
+  'INSERT INTO',
+  'DELETE FROM',
+  'LEFT JOIN',
+  'ORDER BY',
+  'GROUP BY',
+  'IS NULL',
+  'SELECT',
+  'DISTINCT',
+  'FROM',
+  'WHERE',
+  'AND',
+  'OR',
+  'IN',
+  'BETWEEN',
+  'LIKE',
+  'DESC',
+  'LIMIT',
+  'COUNT',
+  'SUM',
+  'AVG',
+  'MAX',
+  'HAVING',
+  'JOIN',
+  'ON',
+  'VALUES',
+  'UPDATE',
+  'SET',
+];

@@ -535,7 +535,7 @@ const List<WordModel> kWordList = [
   WordModel(
     english: 'join',
     koreanPronunciation: '조인',
-    koreanMeaning: '두 개 이상의 테이블을 연결하여 관련 데이터를 함께 조회하는 연산',
+    koreanMeaning: '두 개 이상의 테이블을 연결하여 관련 데이터를 함께 조회하는 연산 (Python에서는 요소를 구분자로 합치는 문자열 메서드)',
     exampleSentence: 'We use an inner join to combine the orders table with the users table by customer ID.',
     category: 'Database',
   ),
@@ -747,13 +747,6 @@ const List<WordModel> kWordList = [
 
   // ── Naming ────────────────────────────────────────────────────────────────
   WordModel(
-    english: 'count',
-    koreanPronunciation: '카운트',
-    koreanMeaning: '개수를 셀 때 쓰는 변수명',
-    exampleSentence: 'int count = 0; // incremented each time the loop finds a matching item',
-    category: 'Naming',
-  ),
-  WordModel(
     english: 'result',
     koreanPronunciation: '리절트',
     koreanMeaning: '함수나 연산의 반환값을 담는 변수명',
@@ -870,13 +863,6 @@ const List<WordModel> kWordList = [
     koreanPronunciation: '민',
     koreanMeaning: '최솟값을 담는 변수명',
     exampleSentence: 'int min = list.reduce((a, b) => a < b ? a : b);',
-    category: 'Naming',
-  ),
-  WordModel(
-    english: 'sum',
-    koreanPronunciation: '섬',
-    koreanMeaning: '합산 결과를 담는 변수명',
-    exampleSentence: 'int sum = numbers.fold(0, (acc, n) => acc + n);',
     category: 'Naming',
   ),
   WordModel(
@@ -1084,21 +1070,21 @@ const List<WordModel> kWordList = [
   WordModel(
     english: 'forEach',
     koreanPronunciation: '포이치',
-    koreanMeaning: '배열의 각 요소마다 콜백 함수를 실행하는 배열 메서드',
+    koreanMeaning: '배열(컬렉션)의 각 요소마다 주어진 동작을 실행하는 메서드 (JS·Kotlin 공통)',
     exampleSentence: 'items.forEach(item => console.log(item.name));',
     category: 'JavaScript',
   ),
   WordModel(
     english: 'map',
     koreanPronunciation: '맵',
-    koreanMeaning: '각 요소를 변환한 결과로 새 배열을 반환하는 배열 메서드',
+    koreanMeaning: '각 요소를 변환한 결과로 새 배열(컬렉션)을 반환하는 함수 (JS·Python·Kotlin 공통)',
     exampleSentence: 'const prices = items.map(item => item.price * 1.1); // apply 10% tax',
     category: 'JavaScript',
   ),
   WordModel(
     english: 'filter',
     koreanPronunciation: '필터',
-    koreanMeaning: '조건을 만족하는 요소만 추려낸 새 배열을 반환하는 배열 메서드',
+    koreanMeaning: '조건을 만족하는 요소만 추려 새 배열(컬렉션)을 반환하는 함수 (JS·Python·Kotlin 공통)',
     exampleSentence: 'const active = users.filter(u => u.isActive);',
     category: 'JavaScript',
   ),
@@ -1217,7 +1203,7 @@ const List<WordModel> kWordList = [
   WordModel(
     english: 'split',
     koreanPronunciation: '스플릿',
-    koreanMeaning: '문자열을 구분자 기준으로 나눠 배열로 반환하는 메서드',
+    koreanMeaning: '문자열을 구분자 기준으로 나눠 배열(리스트)로 반환하는 메서드 (JS·Dart·Python 공통)',
     exampleSentence: 'const tags = "flutter,dart,mobile".split(","); // ["flutter","dart","mobile"]',
     category: 'JavaScript',
   ),
@@ -1599,9 +1585,9 @@ const List<WordModel> kWordList = [
     category: 'Dart',
   ),
   WordModel(
-    english: 'cascade (..)',
+    english: 'cascade',
     koreanPronunciation: '캐스케이드',
-    koreanMeaning: '동일 객체에 연속으로 메서드를 호출하는 .. 연산자',
+    koreanMeaning: '동일 객체에 연속으로 메서드를 호출하는 Dart의 .. 연산자',
     exampleSentence: 'paint..color = Colors.red ..strokeWidth = 2 ..style = PaintingStyle.stroke;',
     category: 'Dart',
   ),
@@ -1643,7 +1629,7 @@ const List<WordModel> kWordList = [
   WordModel(
     english: 'fold',
     koreanPronunciation: '폴드',
-    koreanMeaning: '초기값부터 시작해 Iterable을 하나의 값으로 누적 집계하는 메서드',
+    koreanMeaning: '초기값부터 시작해 컬렉션을 하나의 값으로 누적 집계하는 메서드 (Dart·Kotlin 공통)',
     exampleSentence: 'final total = prices.fold(0.0, (sum, p) => sum + p);',
     category: 'Dart',
   ),
@@ -1680,13 +1666,6 @@ const List<WordModel> kWordList = [
     koreanPronunciation: '소트',
     koreanMeaning: 'List를 제자리에서 정렬하는 메서드',
     exampleSentence: 'scores.sort((a, b) => b.compareTo(a)); // descending order',
-    category: 'Dart',
-  ),
-  WordModel(
-    english: 'split',
-    koreanPronunciation: '스플릿',
-    koreanMeaning: '문자열을 패턴 기준으로 나눠 List<String>을 반환하는 메서드',
-    exampleSentence: 'final parts = "2024-01-15".split("-"); // ["2024", "01", "15"]',
     category: 'Dart',
   ),
   WordModel(
@@ -1797,9 +1776,9 @@ const List<WordModel> kWordList = [
     category: 'Python',
   ),
   WordModel(
-    english: 'try/except',
-    koreanPronunciation: '트라이익셉트',
-    koreanMeaning: '예외가 발생할 수 있는 코드를 안전하게 처리하는 예외 처리 구문',
+    english: 'except',
+    koreanPronunciation: '익셉트',
+    koreanMeaning: 'try 블록에서 발생한 예외를 받아 처리할 코드를 지정하는 Python 키워드',
     exampleSentence: 'try:\n    result = 10 / divisor\nexcept ZeroDivisionError:\n    result = 0',
     category: 'Python',
   ),
@@ -1822,34 +1801,6 @@ const List<WordModel> kWordList = [
     koreanPronunciation: '어펜드',
     koreanMeaning: '리스트 끝에 요소를 하나 추가하는 메서드',
     exampleSentence: 'results.append({"status": "ok", "id": item_id})',
-    category: 'Python',
-  ),
-  WordModel(
-    english: 'split',
-    koreanPronunciation: '스플릿',
-    koreanMeaning: '문자열을 구분자 기준으로 나눠 리스트로 반환하는 메서드',
-    exampleSentence: 'headers = line.strip().split(",")  # CSV parsing',
-    category: 'Python',
-  ),
-  WordModel(
-    english: 'join',
-    koreanPronunciation: '조인',
-    koreanMeaning: '이터러블의 요소를 구분자 문자열로 합치는 str 메서드',
-    exampleSentence: 'path = "/".join(["usr", "local", "bin"])  # "usr/local/bin"',
-    category: 'Python',
-  ),
-  WordModel(
-    english: 'map',
-    koreanPronunciation: '맵',
-    koreanMeaning: '함수를 이터러블의 각 요소에 적용하는 내장 함수',
-    exampleSentence: 'prices = list(map(float, raw_prices))',
-    category: 'Python',
-  ),
-  WordModel(
-    english: 'filter',
-    koreanPronunciation: '필터',
-    koreanMeaning: '조건 함수를 통과하는 요소만 걸러내는 내장 함수',
-    exampleSentence: 'active = list(filter(lambda u: u.is_active, users))',
     category: 'Python',
   ),
   WordModel(
@@ -1904,9 +1855,9 @@ const List<WordModel> kWordList = [
     category: 'SQL',
   ),
   WordModel(
-    english: 'UPDATE SET',
-    koreanPronunciation: '업데이트셋',
-    koreanMeaning: '기존 행의 컬럼 값을 변경하는 DML 명령어',
+    english: 'UPDATE',
+    koreanPronunciation: '업데이트',
+    koreanMeaning: '기존 행의 컬럼 값을 변경하는 DML 명령어 (SET으로 바꿀 값을 지정)',
     exampleSentence: 'UPDATE users SET last_login = NOW() WHERE id = 42;',
     category: 'SQL',
   ),
@@ -1932,9 +1883,9 @@ const List<WordModel> kWordList = [
     category: 'SQL',
   ),
   WordModel(
-    english: 'LIMIT / OFFSET',
-    koreanPronunciation: '리밋오프셋',
-    koreanMeaning: '반환할 최대 행 수를 제한하고 시작 위치를 건너뛰는 페이징 절',
+    english: 'OFFSET',
+    koreanPronunciation: '오프셋',
+    koreanMeaning: '결과의 앞쪽 행을 지정한 수만큼 건너뛰는 절로, LIMIT과 함께 페이징에 사용',
     exampleSentence: 'SELECT * FROM posts ORDER BY created_at DESC LIMIT 20 OFFSET 40;',
     category: 'SQL',
   ),
@@ -2037,9 +1988,9 @@ const List<WordModel> kWordList = [
     category: 'SQL',
   ),
   WordModel(
-    english: 'CTE (WITH)',
-    koreanPronunciation: '씨티이',
-    koreanMeaning: '쿼리 내에서 임시로 이름 붙인 결과셋을 정의하는 공통 테이블 식',
+    english: 'common table expression',
+    koreanPronunciation: '커먼테이블익스프레션',
+    koreanMeaning: '쿼리 안에서 WITH로 임시 결과셋에 이름을 붙여 정의하는 공통 테이블 식 (CTE)',
     exampleSentence: 'WITH monthly AS (SELECT DATE_FORMAT(created_at,"%Y-%m") m, SUM(amount) s FROM orders GROUP BY m) SELECT * FROM monthly ORDER BY m;',
     category: 'SQL',
   ),
@@ -2113,13 +2064,6 @@ const List<WordModel> kWordList = [
     exampleSentence: 'SELECT e.name, m.name AS manager FROM employees e JOIN employees m ON e.manager_id = m.id;',
     category: 'SQL',
   ),
-  WordModel(
-    english: 'BEGIN / COMMIT / ROLLBACK',
-    koreanPronunciation: '비긴커밋롤백',
-    koreanMeaning: '트랜잭션을 시작·확정·취소하는 TCL 명령어 세트',
-    exampleSentence: 'BEGIN; UPDATE accounts SET balance = balance - 100 WHERE id = 1; UPDATE accounts SET balance = balance + 100 WHERE id = 2; COMMIT;',
-    category: 'SQL',
-  ),
 
   // ── NoSQL ────────────────────────────────────────────────────────────────
   WordModel(
@@ -2144,10 +2088,10 @@ const List<WordModel> kWordList = [
     category: 'NoSQL',
   ),
   WordModel(
-    english: 'embed vs reference',
-    koreanPronunciation: '임베드브이에스레퍼런스',
-    koreanMeaning: '관련 데이터를 document 안에 중첩 저장(embed)하거나 ID로 참조(reference)하는 NoSQL 설계 선택',
-    exampleSentence: 'embed: { comments: [...] } 는 읽기 빠름. reference: comments 컬렉션 별도 → 쓰기 유연.',
+    english: 'embed',
+    koreanPronunciation: '임베드',
+    koreanMeaning: '관련 데이터를 별도 컬렉션 대신 document 안에 중첩해 저장하는 NoSQL 설계 방식 (반대는 reference)',
+    exampleSentence: 'Embed the comments inside the post document when they are always read together.',
     category: 'NoSQL',
   ),
   WordModel(
@@ -2293,31 +2237,10 @@ const List<WordModel> kWordList = [
     category: 'Kotlin',
   ),
   WordModel(
-    english: 'Elvis (?:)',
+    english: 'Elvis',
     koreanPronunciation: '엘비스',
-    koreanMeaning: '좌변이 null이면 우변의 기본값을 반환하는 ?: 연산자',
+    koreanMeaning: '좌변이 null이면 우변의 기본값을 반환하는 Kotlin의 ?: 연산자',
     exampleSentence: 'val name = user?.name ?: "Anonymous" // fallback if null',
-    category: 'Kotlin',
-  ),
-  WordModel(
-    english: 'map',
-    koreanPronunciation: '맵',
-    koreanMeaning: '각 요소에 변환 함수를 적용해 새 리스트를 반환하는 확장 함수',
-    exampleSentence: 'val names = users.map { it.name }',
-    category: 'Kotlin',
-  ),
-  WordModel(
-    english: 'filter',
-    koreanPronunciation: '필터',
-    koreanMeaning: '조건을 만족하는 요소만 포함한 새 리스트를 반환하는 확장 함수',
-    exampleSentence: 'val adults = users.filter { it.age >= 18 }',
-    category: 'Kotlin',
-  ),
-  WordModel(
-    english: 'forEach',
-    koreanPronunciation: '포이치',
-    koreanMeaning: '컬렉션의 각 요소에 주어진 동작을 순서대로 수행하는 확장 함수',
-    exampleSentence: 'items.forEach { println(it.id) }',
     category: 'Kotlin',
   ),
   WordModel(
@@ -2339,13 +2262,6 @@ const List<WordModel> kWordList = [
     koreanPronunciation: '테이크이프',
     koreanMeaning: '조건이 true이면 객체를, false이면 null을 반환하는 필터링 확장 함수',
     exampleSentence: 'val validAge = age.takeIf { it >= 0 } ?: 0',
-    category: 'Kotlin',
-  ),
-  WordModel(
-    english: 'fold',
-    koreanPronunciation: '폴드',
-    koreanMeaning: '초기값부터 시작해 컬렉션을 하나의 값으로 누적 집계하는 확장 함수',
-    exampleSentence: 'val total = prices.fold(0.0) { acc, p -> acc + p }',
     category: 'Kotlin',
   ),
   WordModel(
@@ -2415,6 +2331,10 @@ const Map<String, String> kCategoryType = {
   'SQL': 'db',
   'NoSQL': 'db',
 };
+
+/// 코드에 그대로 쓰는 철자(코딩 실무)는 대소문자까지 맞아야 정답
+bool isCaseSensitiveCategory(String category) =>
+    kCategoryType[category] == 'practical';
 
 const List<String> kConceptCategories = [
   'Git', 'OOP', 'Architecture', 'DevOps', 'Testing',

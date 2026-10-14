@@ -54,8 +54,10 @@ final appRouter = GoRouter(
       routes: [
         GoRoute(
           path: 'spelling',
-          builder: (context, state) =>
-              SpellingPracticeScreen(english: state.pathParameters['english']!),
+          builder: (context, state) => SpellingPracticeScreen(
+            english: state.pathParameters['english']!,
+            fromDaily: state.uri.queryParameters['from'] == 'daily',
+          ),
         ),
       ],
     ),

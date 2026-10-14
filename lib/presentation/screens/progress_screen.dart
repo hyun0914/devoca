@@ -624,7 +624,7 @@ class _CriteriaSheet extends StatelessWidget {
                 const SizedBox(width: 8),
                 const Expanded(
                   child: Text(
-                    '4일 이내에 맞춰도 인터벌 횟수가 오르지 않아요.\n충분한 간격을 두고 다시 맞춰야 장기 기억이 됩니다.',
+                    '4일 이내에 맞춰도 인터벌 횟수가 오르지 않아요.\n충분한 간격을 두고 다시 맞춰야 장기 기억이 됩니다.\n철자를 틀리면 인터벌 횟수가 1회 줄어들어요.',
                     style: TextStyle(fontSize: 12, height: 1.5),
                   ),
                 ),

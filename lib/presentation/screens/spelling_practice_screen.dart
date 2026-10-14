@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import '../../data/services/tts_service.dart';
 import '../../data/word_data.dart';
 import '../../domain/models/word_model.dart';
 import '../cubits/progress/progress_cubit.dart';
@@ -8,7 +9,15 @@ import '../widgets/category_chip.dart';
 
 class SpellingPracticeScreen extends StatefulWidget {
   final String english;
-  const SpellingPracticeScreen({super.key, required this.english});
+
+  /// 오늘의 학습에서 카드를 보지 않고 바로 들어온 경우
+  final bool fromDaily;
+
+  const SpellingPracticeScreen({
+    super.key,
+    required this.english,
+    this.fromDaily = false,
+  });
 
   @override
   State<SpellingPracticeScreen> createState() => _SpellingPracticeScreenState();
@@ -29,7 +38,16 @@ class _SpellingPracticeScreenState extends State<SpellingPracticeScreen> {
     }
   }
 
-  bool get _isCorrect => _typed.toLowerCase() == _word?.english.toLowerCase();
+  bool get _caseSensitive =>
+      _word != null && isCaseSensitiveCategory(_word!.category);
+
+  bool get _isCorrect {
+    final answer = _word?.english;
+    if (answer == null) return false;
+    return _caseSensitive
+        ? _typed == answer
+        : _typed.toLowerCase() == answer.toLowerCase();
+  }
 
   void _onChanged(String value) {
     final word = _word;
@@ -37,16 +55,15 @@ class _SpellingPracticeScreenState extends State<SpellingPracticeScreen> {
     final capped = value.length > word.english.length
         ? value.substring(0, word.english.length)
         : value;
-    if (capped != value) _controller.value = _controller.value.copyWith(text: capped);
-    setState(() => _typed = capped);
-
-    if (capped.length == word.english.length && !_submitted) {
-      _submit();
+    if (capped != value) {
+      _controller.value = _controller.value.copyWith(text: capped);
     }
+    setState(() => _typed = capped);
   }
 
+  // 글자별 정답은 제출한 뒤에만 보여준다. 입력 중에 보여주면 찍어서 맞출 수 있다.
   void _submit() {
-    if (_submitted) return;
+    if (_submitted || _typed.isEmpty) return;
     setState(() => _submitted = true);
     if (!_resultSaved) {
       _resultSaved = true;
@@ -77,7 +94,8 @@ class _SpellingPracticeScreenState extends State<SpellingPracticeScreen> {
   Widget build(BuildContext context) {
     final word = _word;
     if (word == null) {
-      return Scaffold(appBar: AppBar(), body: const Center(child: Text('단어를 찾을 수 없습니다')));
+      return Scaffold(
+          appBar: AppBar(), body: const Center(child: Text('단어를 찾을 수 없습니다')));
     }
 
     final colorScheme = Theme.of(context).colorScheme;
@@ -93,7 +111,8 @@ class _SpellingPracticeScreenState extends State<SpellingPracticeScreen> {
           return Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 600),
-              child: Padding(
+              // 키보드가 올라오면 높이가 부족해지므로 스크롤 가능하게 둔다
+              child: SingleChildScrollView(
                 padding: EdgeInsets.symmetric(
                   horizontal: isWide ? 40 : 24,
                   vertical: 24,
@@ -103,10 +122,11 @@ class _SpellingPracticeScreenState extends State<SpellingPracticeScreen> {
                   children: [
                     CategoryChip(category: word.category),
                     const SizedBox(height: 24),
-                    _HintCard(word: word),
+                    _HintCard(word: word, caseSensitive: _caseSensitive),
                     const SizedBox(height: 32),
                     _LetterBoxes(
                       word: word.english,
+                      caseSensitive: _caseSensitive,
                       typed: _typed,
                       submitted: _submitted,
                     ),
@@ -126,7 +146,23 @@ class _SpellingPracticeScreenState extends State<SpellingPracticeScreen> {
                         ),
                         textAlign: TextAlign.center,
                         style: const TextStyle(fontSize: 18, letterSpacing: 2),
+                        // 키보드 추천 단어에 정답 철자가 뜨지 않도록 끈다
+                        autocorrect: false,
+                        enableSuggestions: false,
+                        textInputAction: TextInputAction.done,
                         onChanged: _onChanged,
+                        onSubmitted: (_) => _submit(),
+                      ),
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton(
+                          onPressed: _typed.isEmpty ? null : _submit,
+                          style: FilledButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                          ),
+                          child: const Text('확인'),
+                        ),
                       ),
                     ] else ...[
                       _ResultBanner(correct: _isCorrect, answer: word.english),
@@ -142,11 +178,18 @@ class _SpellingPracticeScreenState extends State<SpellingPracticeScreen> {
                           ),
                           const SizedBox(width: 12),
                           Expanded(
-                            child: FilledButton.icon(
-                              onPressed: () => context.pop(),
-                              icon: const Icon(Icons.arrow_back_rounded),
-                              label: const Text('단어 카드로'),
-                            ),
+                            child: widget.fromDaily
+                                ? FilledButton.icon(
+                                    onPressed: () => context.pushReplacement(
+                                        '/word/${word.english}'),
+                                    icon: const Icon(Icons.style_rounded),
+                                    label: const Text('단어 카드 보기'),
+                                  )
+                                : FilledButton.icon(
+                                    onPressed: () => context.pop(),
+                                    icon: const Icon(Icons.arrow_back_rounded),
+                                    label: const Text('단어 카드로'),
+                                  ),
                           ),
                         ],
                       ),
@@ -164,7 +207,8 @@ class _SpellingPracticeScreenState extends State<SpellingPracticeScreen> {
 
 class _HintCard extends StatelessWidget {
   final WordModel word;
-  const _HintCard({required this.word});
+  final bool caseSensitive;
+  const _HintCard({required this.word, required this.caseSensitive});
 
   @override
   Widget build(BuildContext context) {
@@ -194,9 +238,17 @@ class _HintCard extends StatelessWidget {
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 14, height: 1.5),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 4),
+          // 한글 발음만으로는 cache/cash처럼 철자를 구분할 수 없어 실제 발음을 들려준다
+          TextButton.icon(
+            onPressed: () => TtsService.instance.speak(word.english),
+            icon: const Icon(Icons.volume_up_rounded, size: 20),
+            label: const Text('발음 듣기'),
+          ),
           Text(
-            '${word.english.length}자',
+            caseSensitive
+                ? '${word.english.length}자 · 대소문자 구분'
+                : '${word.english.length}자',
             style: TextStyle(fontSize: 12, color: Colors.grey[500]),
           ),
         ],
@@ -207,11 +259,13 @@ class _HintCard extends StatelessWidget {
 
 class _LetterBoxes extends StatelessWidget {
   final String word;
+  final bool caseSensitive;
   final String typed;
   final bool submitted;
 
   const _LetterBoxes({
     required this.word,
+    required this.caseSensitive,
     required this.typed,
     required this.submitted,
   });
@@ -225,7 +279,9 @@ class _LetterBoxes extends StatelessWidget {
       children: List.generate(word.length, (i) {
         final typedChar = i < typed.length ? typed[i] : '';
         final correct = typedChar.isNotEmpty &&
-            typedChar.toLowerCase() == word[i].toLowerCase();
+            (caseSensitive
+                ? typedChar == word[i]
+                : typedChar.toLowerCase() == word[i].toLowerCase());
 
         Color bgColor;
         Color borderColor;
@@ -235,6 +291,10 @@ class _LetterBoxes extends StatelessWidget {
           bgColor = Colors.grey[100]!;
           borderColor = Colors.grey[300]!;
           textColor = Colors.grey[400]!;
+        } else if (!submitted) {
+          bgColor = Colors.white;
+          borderColor = Colors.grey[600]!;
+          textColor = Colors.grey[900]!;
         } else if (correct) {
           bgColor = Colors.green[50]!;
           borderColor = Colors.green;
@@ -255,13 +315,13 @@ class _LetterBoxes extends StatelessWidget {
           ),
           alignment: Alignment.center,
           child: Text(
-            typedChar.isNotEmpty
-                ? typedChar.toUpperCase()
-                : (submitted ? word[i].toUpperCase() : ''),
+            // 대소문자도 철자의 일부라 입력한 그대로 보여준다
+            typedChar.isNotEmpty ? typedChar : (submitted ? word[i] : ''),
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: submitted && typedChar.isEmpty ? Colors.grey[400] : textColor,
+              color:
+                  submitted && typedChar.isEmpty ? Colors.grey[400] : textColor,
             ),
           ),
         );

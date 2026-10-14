@@ -22,10 +22,13 @@ class ProgressCubit extends Cubit<ProgressState> {
   }
 
   Future<void> _load() async {
-    final progress = await _repo.loadAll();
+    // 단어 목록에서 빠진 단어의 기록은 통계에 섞이지 않도록 버린다
+    final known = {for (final w in kWordList) w.english};
+    final progress = (await _repo.loadAll())
+      ..removeWhere((english, _) => !known.contains(english));
     final today = _todayKey;
     var todayWords = await _repo.loadDailyWords(today);
-    if (todayWords == null) {
+    if (todayWords == null || !todayWords.every(known.contains)) {
       todayWords = _computeTodayWords(progress);
       await _repo.saveDailyWords(today, todayWords);
     }
@@ -62,6 +65,10 @@ class ProgressCubit extends Cubit<ProgressState> {
     }
 
     unstarted.sort((a, b) {
+      // 3글자 이하(len, DNS 등)는 다른 미학습 단어를 다 본 뒤에 추천
+      final shortCompare =
+          (_isShort(a.key) ? 1 : 0).compareTo(_isShort(b.key) ? 1 : 0);
+      if (shortCompare != 0) return shortCompare;
       if (a.value == null && b.value == null) return 0;
       if (a.value == null) return -1;
       if (b.value == null) return 1;
@@ -81,6 +88,8 @@ class ProgressCubit extends Cubit<ProgressState> {
     ].take(_dailyCount).toList();
   }
 
+  static bool _isShort(String english) => english.length <= 3;
+
   Future<void> recordPractice(String english, {required bool correct}) async {
     final current = state.progressFor(english);
     final now = DateTime.now();
@@ -94,6 +103,9 @@ class ProgressCubit extends Cubit<ProgressState> {
       if (daysSinceLast >= WordProgress.intervalDays) {
         newIntervalCorrects += 1;
       }
+    } else if (newIntervalCorrects > 0) {
+      // 틀리면 한 단계 후퇴 — 마스터한 단어도 다시 학습 중으로 돌아간다
+      newIntervalCorrects -= 1;
     }
 
     final updated = WordProgress(

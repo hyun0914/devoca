@@ -90,4 +90,19 @@ void main() {
     expect(tables['users']!.columns, ['id', 'name', 'age', 'city']);
     expect(tables['users']!.rows, hasLength(7));
   });
+
+  test('힌트 키워드는 정답 쿼리에서 순서대로 뽑힌다', () {
+    expect(problem('where-age').keywords, ['SELECT', 'FROM', 'WHERE']);
+    expect(problem('order-limit').keywords,
+        ['SELECT', 'FROM', 'ORDER BY', 'DESC', 'LIMIT']);
+    expect(
+        problem('join-left').keywords, ['SELECT', 'FROM', 'LEFT JOIN', 'ON']);
+    expect(problem('join-three').keywords, ['SELECT', 'FROM', 'JOIN', 'ON']);
+    expect(
+        problem('where-null').keywords, ['SELECT', 'FROM', 'WHERE', 'IS NULL']);
+    expect(problem('insert-user').keywords, ['INSERT INTO', 'VALUES']);
+    for (final p in kSqlProblems) {
+      expect(p.keywords, isNotEmpty, reason: p.id);
+    }
+  });
 }
